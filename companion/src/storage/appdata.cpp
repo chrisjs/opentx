@@ -327,13 +327,10 @@ void AppData::convertSettings(QSettings & settings)
 
 bool AppData::findPreviousVersionSettings(QString * version) const
 {
-  QSettings * fromSettings = NULL;
-  *version = "";
-
   QSettings settings21("OpenTX", "Companion 2.1");
   if (settings21.contains(settingsVersionKey)) {
-    fromSettings = &settings21;
-    *version = "2.1";
+    *version = QStringLiteral("2.1");
+    return true;
   }
   else {
     settings21.clear();
@@ -341,10 +338,8 @@ bool AppData::findPreviousVersionSettings(QString * version) const
 
   QSettings settings20("OpenTX", "Companion 2.0");
   if (settings20.contains(settingsVersionKey)) {
-    if (!fromSettings) {
-      fromSettings = &settings20;
-      *version = "2.0";
-    }
+    *version = QStringLiteral("2.0");
+    return true;
   }
   else {
     settings20.clear();
@@ -352,19 +347,14 @@ bool AppData::findPreviousVersionSettings(QString * version) const
 
   QSettings settings16("OpenTX", "OpenTX Companion");
   if (settings16.contains(settingsVersionKey)) {
-    if (!fromSettings) {
-      fromSettings = &settings16;
-      *version = "1.x";
-    }
+    *version = QStringLiteral("1.x");
+    return true;
   }
   else {
     settings16.clear();
   }
 
-  if (!fromSettings)
-    return false;
-
-  return true;
+  return false;
 }
 
 bool AppData::importSettings(QString fromVersion)
@@ -392,11 +382,18 @@ bool AppData::importSettings(QString fromVersion)
   upgradeFromVersion = fromVersion;
 
   QSettings fromSettings(fromCompany, fromProduct);
+  return importSettings(&fromSettings);
+}
+
+bool AppData::importSettings(QSettings * fromSettings)
+{
+  if (!fromSettings)
+    return false;
 
   // do not copy these settings
   QStringList excludeKeys = deprecatedSettings();
   excludeKeys << "compilation-server";
-#ifdef WIN32
+#ifdef Q_OS_WIN32
   // locations of tools which come with Companion distros
   excludeKeys << "avrdude_location" << "avrdudeLocation" << "dfu_location";
   // install-specific keys;  "." is the "default" key which may contain install path
@@ -404,9 +401,9 @@ bool AppData::importSettings(QString fromVersion)
 #endif
 
   // import settings
-  foreach (const QString & key, fromSettings.allKeys()) {
-    if (fromSettings.value(key).isValid() && !excludeKeys.contains(key)) {
-      m_settings.setValue(key, fromSettings.value(key));
+  foreach (const QString & key, fromSettings->allKeys()) {
+    if (fromSettings->value(key).isValid() && !excludeKeys.contains(key)) {
+      m_settings.setValue(key, fromSettings->value(key));
     }
   }
 

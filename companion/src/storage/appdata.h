@@ -307,6 +307,7 @@ class AppData: protected CompStoreObj
     QMap<int, QString> getActiveProfiles() const;
     bool findPreviousVersionSettings(QString * version) const;
     bool importSettings(QString fromVersion);
+    bool importSettings(QSettings * fromSettings);
 
     inline DownloadBranchType boundedOpenTxBranch() const {
 #if defined(ALLOW_NIGHTLY_BUILDS)
