@@ -87,16 +87,15 @@ void postModelLoad(bool alarms)
 #endif
 
   LOAD_MODEL_CURVES();
-
   resumeMixerCalculations();
   if (pulsesStarted()) {
 #if defined(GUI)
     if (alarms) {
       checkAll();
       PLAY_MODEL_NAME();
+      resumePulses();
     }
 #endif
-    resumePulses();
   }
 
 #if defined(TELEMETRY_FRSKY)
