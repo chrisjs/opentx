@@ -93,8 +93,8 @@ void postModelLoad(bool alarms)
     if (alarms) {
       checkAll();
       PLAY_MODEL_NAME();
-      resumePulses();
     }
+    resumePulses();
 #endif
   }
 
